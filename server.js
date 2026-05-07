@@ -20,7 +20,7 @@ app.get('/api/dados/:id', (req,res) => {
     const dado = historicoSensores.find(s => s.id === id);
 
     if (!dado){
-        return res.status(400).json({mensagem:"ID não encontrado, verifique e tente novamente."});
+        return res.status(404).json({mensagem:"ID não encontrado, verifique e tente novamente."});
     }
     res.json(dado);
 }); 
@@ -49,13 +49,27 @@ app.delete('/api/dados/:id', (req,res) => {
     const index = historicoSensores.findIndex (s => s.id === id);
 
     if (index === -1){
-        return res.status(400).json({mensagem:"Dado não encontrado, verifique e tente novamente."});
+        return res.status(404).json({mensagem:"Não é possível deletar um dado inexistente."});
     }
 
     historicoSensores.splice(index,1);
 
     res.json({mensagem:"Dados apagados com sucesso."});
 
+});
+
+app.put('/api/dados/:id', (req,res) => {
+    const id = parseInt(req.params.id);
+    const index = historicoSensores.findIndex(s => s.id === id);
+
+    if (index === -1){
+        return res.status(404).json({mensagem:"Não é possível atualizar um dado inexistente."});
+    }
+
+    const{temperatura,umidade,hora} = req.body;
+    historicoSensores[index] = {id,temperatura,umidade,hora};
+    res.json({mensagem:"Dados atualizados com sucesso."});
+    
 });
 
 const PORT = process.env.PORT || 3000;
